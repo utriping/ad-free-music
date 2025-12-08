@@ -4,6 +4,8 @@ import sample from "../sample.json";
 import { supabase } from "../supabase";
 import Downloads from "./Downloads";
 import Donwloads from "./Downloads";
+import dotenv from "dotenv";
+dotenv.config();
 export default function CardContainer({
   query,
   setSongUrl,
@@ -12,6 +14,7 @@ export default function CardContainer({
 }) {
   const [songsData, setSongsData] = useState([]);
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // const apiKey = process.env.PARCEL_YOUTUBE_API_KEY;
   const apiKey = "AIzaSyCmBVAEHesCcl8xCYCtQIruse0UMUGHeD4";
@@ -19,6 +22,8 @@ export default function CardContainer({
   useEffect(() => {
     async function getData() {
       if (query === "") {
+        setIsLoading(false);
+        setError(false);
         //downloads matlab storage ke buckets me se jitne bhi songs downloaded hai unko fetch karna hai and idhar dikhana hai
         // const { data, error } = await supabase.storage
         //   .from("songs") // your bucket name
@@ -34,9 +39,13 @@ export default function CardContainer({
         // }
         // console.log(data);
       } else if (query === "eminem") {
+        setIsLoading(false);
+        setError(false);
         setSongsData(sample.items);
         return;
       } else {
+        setIsLoading(true);
+        setError(false);
         try {
           const res = await fetch(
             `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${apiKey}&maxResults=${maxResults}`
@@ -44,11 +53,12 @@ export default function CardContainer({
           const data = await res.json();
           console.log(data);
           setSongsData(data.items || []);
-          console.log(songsData);
+          setIsLoading(false);
         } catch (err) {
           console.log(err);
           setError(true);
           setSongsData([]);
+          setIsLoading(false);
         }
       }
     }
@@ -67,26 +77,50 @@ export default function CardContainer({
         />
       ) : (
         <main className="card-container">
-          <h1>Songs you are looking for...</h1>
-          {!error &&
-            songsData.map((item, id) => {
-              const reqData = {
-                title: item.snippet.title,
-                thumbnail: item.snippet.thumbnails.medium.url,
-                channel: item.snippet.channelTitle,
-                url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-              };
-              console.log(reqData.url);
-              return (
-                <Card
-                  data={reqData}
-                  key={id}
-                  setSongUrl={setSongUrl}
-                  setIsPlaying={setIsPlaying}
-                  isPlaying={isPlaying}
-                />
-              );
-            })}
+          <h1>
+            <i className="fas fa-music"></i>
+            {query ? `Songs for "${query}"` : "Discover Music"}
+          </h1>
+          {error && (
+            <div className="error-message">
+              <i className="fas fa-exclamation-triangle"></i>
+              <p>Oops! Something went wrong. Please try again.</p>
+            </div>
+          )}
+          {!error && isLoading && query && (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Searching for songs...</p>
+            </div>
+          )}
+          {!error && !isLoading && songsData.length === 0 && query && (
+            <div className="empty-state">
+              <i className="fas fa-search"></i>
+              <p>No songs found. Try a different search term.</p>
+            </div>
+          )}
+          {!error && songsData.length > 0 && (
+            <div className="cards-grid">
+              {songsData.map((item, id) => {
+                const reqData = {
+                  title: item.snippet.title,
+                  thumbnail: item.snippet.thumbnails.medium.url,
+                  channel: item.snippet.channelTitle,
+                  url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+                };
+                return (
+                  <Card
+                    data={reqData}
+                    key={id}
+                    index={id}
+                    setSongUrl={setSongUrl}
+                    setIsPlaying={setIsPlaying}
+                    isPlaying={isPlaying}
+                  />
+                );
+              })}
+            </div>
+          )}
         </main>
       )}
     </>
