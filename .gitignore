@@ -59,3 +59,4 @@ serviceAccountKey.json
 # Local server files
 *.sqlite
 *.db
+*.zip
