@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Card from "./Card";
 import sample from "../sample.json";
 import { supabase } from "../supabase";
 import Downloads from "./Downloads";
 import Donwloads from "./Downloads";
 import dotenv from "dotenv";
+import { DownloadingContext } from "../DownloadingContext";
 dotenv.config();
 export default function CardContainer({
   query,

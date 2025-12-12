@@ -15,6 +15,7 @@ frontend/build/
 backend/dist/
 backend/build/
 
+
 # Environment files
 *.env
 *.env.*

@@ -466,7 +466,7 @@ app.get("/api/downloads", authenticateToken, async (req, res) => {
         };
       });
 
-    res.json({ downloads });
+    res.status(200).json({ downloads });
   } catch (err) {
     console.error("Downloads fetch error:", err);
     res.status(500).json({ error: "Failed to fetch downloads" });

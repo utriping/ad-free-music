@@ -1,28 +1,29 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useAuth } from "../AuthContext";
 import { supabase } from "../supabase";
 import LoadingPage from "./LoadingPage.jsx";
+import { DownloadingContext } from "../DownloadingContext.jsx";
 
-const CountryCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
+const Card = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
   const { title, thumbnail, channel, url } = data;
 
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadState, setDownloadState] = useContext(DownloadingContext);
   const { user } = useAuth();
-
   async function fetchSong() {
-    if (isDownloading) {
+    if (downloadState.isDownloading) {
       return;
     }
     if (isPlaying) {
       setIsPlaying(false);
     }
+
     if (!user) {
       alert("Please login to play songs");
       return;
     }
-    setIsDownloading((prev) => !prev);
+    setDownloadState({ isDownloading: true, downloadingThis: data });
     setIsLoading((prev) => !prev);
     try {
       // Get the current session token
@@ -57,7 +58,10 @@ const CountryCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
       alert(err.message || "Failed to play song. Please try again.");
     } finally {
       setIsLoading(false);
-      setIsDownloading(false);
+      setDownloadState({
+        isDownloading: false,
+        downloadingThis: null,
+      });
     }
   }
 
@@ -93,4 +97,4 @@ const CountryCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
     </div>
   );
 };
-export default CountryCard;
+export default Card;

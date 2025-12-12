@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Search from "./Search";
 import { useAuth } from "../AuthContext";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import { DownloadingContext } from "../DownloadingContext";
 
 export default function Header({ setQuery }) {
   const { user, signOut } = useAuth();

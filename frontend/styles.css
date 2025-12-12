@@ -1,4 +1,25 @@
 /* ===== CSS Variables ===== */
+.dM {
+  background-color: black;
+  width: 100%;
+}
+.dM-content {
+  position: relative;
+  display: inline-block; /* REQUIRED for sliding text or bar */
+  white-space: nowrap;
+  animation: none !important;
+  transition: none !important;
+  animation: infinite-revolve 10s linear infinite !important;
+}
+
+@keyframes infinite-revolve {
+  from {
+    left: -100%;
+  }
+  to {
+    left: calc(100%);
+  }
+}
 :root {
   --primary-color: #6366f1;
   --primary-dark: #4f46e5;
