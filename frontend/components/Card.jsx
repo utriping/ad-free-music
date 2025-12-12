@@ -8,9 +8,13 @@ const CountryCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
 
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { user } = useAuth();
 
   async function fetchSong() {
+    if (isDownloading) {
+      return;
+    }
     if (isPlaying) {
       setIsPlaying(false);
     }
@@ -18,8 +22,8 @@ const CountryCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
       alert("Please login to play songs");
       return;
     }
-
-    setIsLoading(true);
+    setIsDownloading((prev) => !prev);
+    setIsLoading((prev) => !prev);
     try {
       // Get the current session token
       const {
@@ -53,6 +57,7 @@ const CountryCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
       alert(err.message || "Failed to play song. Please try again.");
     } finally {
       setIsLoading(false);
+      setIsDownloading(false);
     }
   }
 
