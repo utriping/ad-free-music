@@ -142,6 +142,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const app = express();
 app.use(cors());
+
 app.use(express.json());
 
 // 🔐 Authentication Middleware
