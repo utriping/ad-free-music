@@ -57,7 +57,7 @@ export default function SideContent() {
   }
   return (
     <>
-      {!displayPopUp ? (
+      {displayPopUp ? (
         <div className="pop-up playlist-creator">
           <div className="inner-container">
             <div
