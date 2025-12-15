@@ -24,7 +24,7 @@ export default function Donwloads({ setSongUrl, setIsPlaying, isPlaying }) {
       try {
         const userId = user.id;
         // List files in the user-specific folder: public/{userId}/
-        const userFolder = `public/${userId}`;
+        const userFolder = `public/${userId}/Downloads`;
 
         let { data, error: listError } = await supabase.storage
           .from("songs")

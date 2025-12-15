@@ -32,7 +32,9 @@ const DownloadCard = ({ data, setSongUrl, isPlaying, setIsPlaying, index }) => {
         )}
       </div>
       <div className="card-text">
-        <h3 className="card-title">{name}</h3>
+        <h3 className="card-title">
+          {name.replaceAll("_-_", " - ").replaceAll("_", " ")}
+        </h3>
         <p className="card-channel">
           <i className="fas fa-download"></i> Downloaded
         </p>

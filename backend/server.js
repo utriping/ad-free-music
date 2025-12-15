@@ -108,7 +108,7 @@ const { exec } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const { createClient } = require("@supabase/supabase-js");
-
+require("dotenv").config();
 // 🛠️ Supabase Setup with Environment Variables
 const SUPABASE_URL =
   process.env.SUPABASE_URL || "https://biviihxkwevconchhbtv.supabase.co";
@@ -288,7 +288,55 @@ app.post("/api/auth/verify", async (req, res) => {
     res.status(500).json({ error: "Verification failed" });
   }
 });
-
+app.post("/api/create-playlist", authenticateToken, async (req, res) => {
+  //get user id
+  //get the name and songs from req.body
+  //copy selected songs data from the songs/public/userId/Downloads into the folder
+  //store the data in songs/public/userId/{playlistName}
+  /*req.body={
+    name:PlayList1,
+    songs:[
+    {
+      name:
+      fileName:
+      url:
+      id:
+    }
+  ]
+  }*/
+  try {
+    const userId = req.user.id;
+    const { name: playlistName, songs: songsData } = req.body;
+    if (!playlistName || !Array.isArray(songsData) || songsData.length == 0)
+      return res.status(400).json({
+        message:
+          "Insufficient data from the user, songs name missing or playlist name missing ",
+      });
+    const songsPath = `public/${userId}/${playlistName}/${playlistName}.json`;
+    const { error } = await supabaseAdmin.storage.from("songs").upload(
+      songsPath,
+      JSON.stringify({
+        name: playlistName,
+        songs: songsData,
+        createdAt: new Date().toISOString(),
+      }),
+      {
+        contentType: "application/json",
+        upsert: true,
+      }
+    );
+    if (error) {
+      throw err;
+    }
+    return res
+      .status(201)
+      .json({ message: "Playlist was created successfully" });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "There was some problem while creating the sever" });
+  }
+});
 // 🎵 Route to download and upload MP3 (Protected)
 app.post("/api/extract", authenticateToken, async (req, res) => {
   const { url } = req.body;
@@ -346,7 +394,7 @@ app.post("/api/extract", authenticateToken, async (req, res) => {
       // Ensure userId doesn't have invalid chars (shouldn't, but just in case)
       const safeUserId = userId.replace(/[^a-zA-Z0-9._-]/g, "");
 
-      const uploadedFileName = `public/${safeUserId}/${timestamp}-${safe}`;
+      const uploadedFileName = `public/${safeUserId}/Downloads/${timestamp}-${safe}`;
 
       // Debug logging
       console.log(`📤 Upload attempt:`);
@@ -419,7 +467,7 @@ app.get("/api/user", authenticateToken, async (req, res) => {
 app.get("/api/downloads", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const userFolder = `public/${userId}`;
+    const userFolder = `public/${userId}/Downloads`;
 
     // List files in the user-specific folder
     const { data, error: listError } = await supabaseAdmin.storage
